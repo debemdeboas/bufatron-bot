@@ -1,29 +1,19 @@
 import asyncio
 import discord
 import os
-import sys
 
 from discord.ext import commands, tasks
 from random      import choice          as random_choice
 
-from clear import *
-
-_description = '''
-Bufatron Bot
-
-we wuz kangs
-'''
+from bot import BufatronBot
 
 #TODO: pesquisas no google
-#TODO: streaming de video
+#TODO: streaming de video -> API nao suporta
 #TODO: streaming de musica
 
-class BufatronBot(commands.Bot):
-    status = ['Destroying Gustavoland', 'Mamando a tua mãe']
+client = BufatronBot()
 
-client = BufatronBot(command_prefix = '$', description = _description)
-
-@client.event
+@client.listen()
 async def on_ready():
     print('Logged in as')
     print(client.user)
@@ -31,22 +21,21 @@ async def on_ready():
     change_status.start()
 
 
-@client.event
+@client.listen()
 async def on_command_error(ctx, error):
     print(error)
+    await ctx.send(f'Wow... The NERVE... You managed to break me, are you proud of yourself? Error {error}')
 
-@client.command()
-async def clear(ctx, amount : int):
-    await ctx.channel.purge(limit = amount)
-
-
-@tasks.loop(seconds = 5)
+# @client.listen()
+# async def on_message(message):
+    
+@tasks.loop(minutes = 5)
 async def change_status():
-    next_status = random_choice(BufatronBot.status)
-    print(client.activity, next_status)
-    await client.change_presence(activity = discord.Game(next_status))
+    await client.change_presence(activity = discord.Game(random_choice(BufatronBot.status)))
 
-print(HELL)
-token = os.getenv('BUFATRON_BOT_OAUTH_TOKEN')
-print(token)
-client.run(token)
+for filename in os.listdir('src/cogs'):
+    if not filename.startswith('wip_') and filename.endswith('.py'):
+        client.load_extension(f'cogs.{filename[:-3]}')
+        print(f'Loaded {filename} as a cog.')
+
+client.run(BufatronBot.token)
