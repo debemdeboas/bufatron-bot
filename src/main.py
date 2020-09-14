@@ -1,10 +1,12 @@
 import asyncio
 import discord
 import os
-# import random
+import sys
 
 from discord.ext import commands, tasks
 from random      import choice          as random_choice
+
+from clear import *
 
 _description = '''
 Bufatron Bot
@@ -44,5 +46,7 @@ async def change_status():
     print(client.activity, next_status)
     await client.change_presence(activity = discord.Game(next_status))
 
-
-client.run(os.getenv('BUFATRON_BOT_OAUTH_TOKEN'))
+print(HELL)
+token = os.getenv('BUFATRON_BOT_OAUTH_TOKEN')
+print(token)
+client.run(token)
